@@ -12,8 +12,9 @@ module Scrappers
     STARS_INDEX = 1
     DATE_INDEX = 2
 
-    def initialize(url, listing_id = nil)
-      @listing_id = listing_id
+    def initialize(url:, listing: nil, user_id: nil)
+      @listing = listing
+      @user_id = user_id
       @property_name = ""
       @reviews_list = []
       super(url)
@@ -27,8 +28,12 @@ module Scrappers
         reviews_button_flow
         modal_flow
         reviews_flow
+        store_reviews
+
+        true
       rescue => e
         puts "#{e}"
+        false
       ensure
         driver.quit
       end
@@ -88,23 +93,54 @@ module Scrappers
       end
 
       reviews.each do |review|
-        name, stars, month, year = parse_review_first_section(review)
-        text = parse_review_second_section(review)
+        user, stars, month, year = parse_user_stars_and_dates(review)
+        text = parse_review_comment(review)
+
+        @reviews_list << {
+          user: user,
+          month: month,
+          year: year.to_i,
+          stars: stars.to_i,
+          content: text.gsub("\n", " "),
+          listing_id: @listing&.id,
+          source_id: review.attribute(SINGLE_REVIEW_CONTAINER[1...-1]) # Remove the brackets for accessing the attribute
+        }
       end
     end
 
-    def parse_review_first_section(review)
-      name = scrapping_wait.until do
+    def store_reviews
+      ActiveRecord::Base.transaction do
+        # First time running the process
+        if @listing.nil?
+          @listing = Listing.new.tap do |listing|
+            listing.user_id = @user_id
+            listing.name = @property_name
+            listing.url = @url
+          end
+          @listing.save!
+          @reviews_list.each { |r| r[:listing_id] = @listing.id }
+        else
+          # This ensures updating the record for the snapshot to see when the porcess was triggered
+          @listing.update!(name: @property_name, updated_at: Time.now.utc)
+        end
+
+        # Avoid creating unnecessary reviews 
+        Review.upsert_all(@reviews_list, unique_by: :source_id)
+      end
+    end
+
+    def parse_user_stars_and_dates(review)
+      user = scrapping_wait.until do
         review.find_element(css: NAME_CONTAINER).text
       end
       info_string = scrapping_wait.until do
         review.find_element(css: DATE_CONTAINER).text
       end
 
-      [name] + extract_stars_and_date(info_string)
+      [user] + extract_stars_and_date(info_string)
     end
 
-    def parse_review_second_section(review)
+    def parse_review_comment(review)
       text = scrapping_wait.until do
         review.find_element(css: REVIEW_TEXT_CONTAINER).text
       end
