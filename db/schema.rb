@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_22_215215) do
+ActiveRecord::Schema[7.1].define(version: 2025_01_23_161136) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,6 +21,21 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_22_215215) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_listings_on_user_id"
+  end
+
+  create_table "reviews", force: :cascade do |t|
+    t.string "source_id", null: false
+    t.string "user", null: false
+    t.string "month", null: false
+    t.integer "year", limit: 2, null: false
+    t.integer "stars", default: 1, null: false
+    t.text "content", default: "", null: false
+    t.bigint "listing_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["listing_id"], name: "index_reviews_on_listing_id"
+    t.index ["source_id"], name: "index_reviews_on_source_id", unique: true
+    t.index ["year"], name: "index_reviews_on_year"
   end
 
   create_table "users", force: :cascade do |t|
@@ -36,4 +51,5 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_22_215215) do
   end
 
   add_foreign_key "listings", "users"
+  add_foreign_key "reviews", "listings"
 end
