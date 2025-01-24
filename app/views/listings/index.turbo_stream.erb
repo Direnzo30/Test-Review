@@ -1,0 +1,14 @@
+<%= turbo_stream.append "listings", partial: "listings/listing", collection: @listings, as: :listing %>
+
+<% if @listings.next_page %>
+  <%= turbo_stream.replace "pagination-button" do %>
+    <button
+      id="pagination-button"
+      data-action="click->pagination#loadMore"
+      data-pagination-next-page-url="<%= listings_path(page: @listings.next_page) %>">
+      Load More
+    </button>
+  <% end %>
+<% else %>
+  <%= turbo_stream.remove "pagination-button" %>
+<% end %>

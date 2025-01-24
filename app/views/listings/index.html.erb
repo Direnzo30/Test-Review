@@ -1,1 +1,16 @@
-<h1>Your Reviews</h1>
+<h1>Your Listings</h1>
+
+<div id="listings" data-controller="pagination" data-pagination-target="listings">
+  <%= render @listings %>
+
+
+  <% if @listings.next_page %>
+    <button
+      id="pagination-button"
+      data-action="click->pagination#loadMore"
+      data-pagination-next-page-url="<%= listings_path(page: @listings.next_page) %>">
+      Load More
+    </button>
+  <% end %>
+</div>
+
