@@ -10,6 +10,11 @@ class ListingsController < ApplicationController
     end
   end
 
+  def new
+  end
+
+  def create
+  end
 
   def show
     @years = @listing.reviews_years

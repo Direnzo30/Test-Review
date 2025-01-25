@@ -1,0 +1,16 @@
+<h1>Airbnb scrapper</h1>
+
+  <%= form_with url: listings_path, method: :post, local: true, class: "needs-validation", data: { controller: 'submit' } do |form| %>
+    <div class="mb-3">
+      <%= form.text_field :url, class: "form-control", placeholder: "Enter Airbnb URL", required: true %>
+    </div>
+
+    <div class="row">
+      <div class="col-1">
+          <button type="submit" class="btn btn-primary btn-block d-flex justify-content-center align-items-center" data-action="submit#submit">
+            <span data-submit-target="text">Submit</span>
+            <span class="spinner-border spinner-border-sm me-2 ms-2 d-none" role="status" aria-hidden="true" data-submit-target="spinner"></span>
+          </button>
+      </div>
+    </div>
+  <% end %>
