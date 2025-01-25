@@ -30,10 +30,10 @@ module Scrappers
         reviews_flow
         store_reviews
 
-        true
+        return @listing
       rescue => e
         puts "#{e}"
-        false
+        return nil
       ensure
         driver.quit
       end

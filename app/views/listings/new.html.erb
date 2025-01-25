@@ -1,6 +1,6 @@
 <h1>Airbnb scrapper</h1>
 
-  <%= form_with url: listings_path, method: :post, local: true, class: "needs-validation", data: { controller: 'submit' } do |form| %>
+  <%= form_with url: listings_path, method: :post, local: true, class: "needs-validation", data: { turbo: false, controller: 'submit' } do |form| %>
     <div class="mb-3">
       <%= form.text_field :url, class: "form-control", placeholder: "Enter Airbnb URL", required: true %>
     </div>

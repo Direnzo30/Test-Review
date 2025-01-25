@@ -14,6 +14,16 @@ class ListingsController < ApplicationController
   end
 
   def create
+    listing = Scrappers::Airbnb.new(url: params[:url], user_id: current_user.id).scrap
+    if listing
+      respond_to do |format|
+        format.html { redirect_to listing }
+      end
+    else
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+      end
+    end
   end
 
   def show
