@@ -4,8 +4,11 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["spinner"];
 
+  connect() {
+    this.spinnerTarget.classList.add("d-none");
+  }
+
   submit(event) {
-    const button = event.currentTarget;
     this.spinnerTarget.classList.remove("d-none");
   }
 }
