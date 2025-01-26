@@ -1,24 +1,26 @@
-# README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+# Test Review
 
-Things you may want to cover:
+## Dependencies (Process for Mac OS)
 
-* Ruby version
+- PostgreSQL database -> brew install postgresql@15
+- chromedriver -> brew install chromedriver
+- redis -> brew install redis
+- ruby 3.0.3 -> can be installed via rvm or rbenv
+- bundler -> gem install bundler
 
-* System dependencies
 
-* Configuration
+## Setup
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- Clone the project
+- apply bundle install for downloading all gems
+- Set the following ENV variables (check config/database.yml for defaults):
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
+    - POSTGRES_HOST
+    - POSTGRES_PORT
+- make sure redis is running -> run `redis-server`
+- execute `bundle exec rake db:setup` for setting up database
+    - a testing user is provided -> email: `test@test.com` password: `123456`
+- run `bundle exec sidekiq`
+- run `bundle exec rails s`
