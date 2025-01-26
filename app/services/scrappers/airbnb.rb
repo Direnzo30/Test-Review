@@ -101,7 +101,7 @@ module Scrappers
           month: month,
           year: year.to_i,
           stars: stars.to_i,
-          content: text.gsub("\n", " "),
+          comment: text.gsub("\n", " "),
           listing_id: @listing&.id,
           source_id: review.attribute(SINGLE_REVIEW_CONTAINER[1...-1]) # Remove the brackets for accessing the attribute
         }
@@ -125,7 +125,7 @@ module Scrappers
         end
 
         # Avoid creating unnecessary reviews 
-        Review.upsert_all(@reviews_list, unique_by: :source_id)
+        Review.upsert_all(@reviews_list, unique_by: [:listing_id, :source_id])
       end
     end
 
