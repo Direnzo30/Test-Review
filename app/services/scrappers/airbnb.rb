@@ -1,5 +1,7 @@
 module Scrappers
   class Airbnb < Scrappers::Base
+    attr_accessor :reviews_list, :tags_list
+
     TRANSLATION_MODAL = 'header[data-testid="translation-announce-modal"]'.freeze
     CLOSE_TRANSLATION_MODAL = 'div[role="dialog"] button[aria-label="Close"]'.freeze
     PROPERTY_NAME_CONTAINER = 'div[data-section-id="TITLE_DEFAULT"] h1.hpipapi'.freeze
@@ -12,11 +14,13 @@ module Scrappers
     STARS_INDEX = 1
     DATE_INDEX = 2
 
-    def initialize(url:, listing: nil, user_id: nil)
+    def initialize(url:, listing: nil, user_id: nil, apply_save: true)
       @listing = listing
       @user_id = user_id
       @property_name = ""
       @reviews_list = []
+      @tags_list = []
+      @apply_save = apply_save
       super(url)
     end
 
@@ -28,7 +32,8 @@ module Scrappers
         reviews_button_flow
         modal_flow
         reviews_flow
-        store_reviews
+        tags_flow
+        store_info if @apply_save
 
         return @listing
       rescue => e
@@ -41,6 +46,7 @@ module Scrappers
 
     private
 
+    # Step 1
     def dismiss_translation_modal
       begin
         translation_modal = scrapping_wait.until do
@@ -57,12 +63,14 @@ module Scrappers
       end
     end
 
+    # Step 2
     def property_name_flow
       @property_name = scrapping_wait.until do
         driver.find_element(css: PROPERTY_NAME_CONTAINER).text
       end
     end
 
+    # Step 3
     def reviews_button_flow
       reviews_button = scrapping_wait.until do
         driver.find_element(css: REVIEWS_BUTTON_CONTAINER)
@@ -70,6 +78,7 @@ module Scrappers
       reviews_button.click
     end
 
+    # Step 4
     def modal_flow
       modal = scrapping_wait.until do
         driver.find_element(css: REVIEWS_AREA_SCROLL_CONTAINER)
@@ -87,6 +96,7 @@ module Scrappers
       end
     end
 
+    # Step 5
     def reviews_flow
       reviews = scrapping_wait.until do
         driver.find_elements(css: SINGLE_REVIEW_CONTAINER)
@@ -105,27 +115,6 @@ module Scrappers
           listing_id: @listing&.id,
           source_id: review.attribute(SINGLE_REVIEW_CONTAINER[1...-1]) # Remove the brackets for accessing the attribute
         }
-      end
-    end
-
-    def store_reviews
-      ActiveRecord::Base.transaction do
-        # First time running the process
-        if @listing.nil?
-          @listing = Listing.new.tap do |listing|
-            listing.user_id = @user_id
-            listing.name = @property_name
-            listing.url = @url
-          end
-          @listing.save!
-          @reviews_list.each { |r| r[:listing_id] = @listing.id }
-        else
-          # This ensures updating the record for the snapshot to see when the porcess was triggered
-          @listing.update!(name: @property_name, updated_at: Time.now.utc)
-        end
-
-        # Avoid creating unnecessary reviews 
-        Review.upsert_all(@reviews_list, unique_by: [:listing_id, :source_id])
       end
     end
 
@@ -153,6 +142,43 @@ module Scrappers
       date = values[DATE_INDEX]
 
       [stars] + Formatting::Dates.month_and_year(date)
+    end
+
+    # Step 6
+    def tags_flow
+      frequencies = Reporting::WordCloud.new(reviews: @reviews_list).generate
+      frequencies.each do |word, count|
+
+        @tags_list << {
+          word: word,
+          count: count,
+          listing_id: @listing&.id
+        }
+      end
+    end
+
+    # Step 7
+    def store_info
+      ActiveRecord::Base.transaction do
+        # First time running the process
+        if @listing.nil?
+          @listing = Listing.new.tap do |listing|
+            listing.user_id = @user_id
+            listing.name = @property_name
+            listing.url = @url
+          end
+          @listing.save!
+          @reviews_list.each { |r| r[:listing_id] = @listing.id }
+          @tags_list.each { |t| t[:listing_id] = @listing.id }
+        else
+          # This ensures updating the record for the snapshot to see when the porcess was triggered
+          @listing.update!(name: @property_name, updated_at: Time.now.utc)
+        end
+
+        # Avoid creating unnecessary reviews 
+        Review.upsert_all(@reviews_list, unique_by: [:listing_id, :source_id])
+        Tag.upsert_all(@tags_list, unique_by: [:listing_id, :word])
+      end
     end
   end
 end
