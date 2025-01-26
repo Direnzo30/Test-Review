@@ -1,6 +1,7 @@
 class Listing < ApplicationRecord
   belongs_to :user
   has_many :reviews
+  has_many :tags
 
   validates :name, :url, :user_id, presence: true
 
