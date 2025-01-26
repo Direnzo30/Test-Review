@@ -12,10 +12,18 @@ export default class extends Controller {
 
     if (!nextPageUrl) return;
 
-    button.classList.add("loading");
-
-    fetch(nextPageUrl, { headers: { Accept: "text/vnd.turbo-stream.html" } })
-      .catch((error) => console.error("Error loading more listings:", error))
-      .finally(() => button.classList.remove("loading"));
+    fetch(nextPageUrl, {
+      headers: {
+        "Accept": "text/vnd.turbo-stream.html",
+      },
+    })
+    .then(response => response.text())
+    .then(turboStream => {
+      console.log(turboStream)
+      document.body.insertAdjacentHTML("beforeend", turboStream);
+    })
+    .catch(error => {
+      console.error('Error fetching chart data:', error);
+    });
   }
 }

@@ -38,23 +38,17 @@ export default class extends Controller {
     const year = this.selectedYearTarget.value;
     const listingId = this.listingIdValue;
 
-    Turbo.visit(`/listings/${listingId}?year=${year}`), {
-      action: "replace",
-      frame: "reviews_chart_container_frame"
-    }
-
-    // Note: This is required because of the fetch, for automatic replace, we need to use Turbo.visit
-    // fetch(`/listings/2?year=${year}`, {
-    //   headers: {
-    //     "Accept": "text/vnd.turbo-stream.html",
-    //   },
-    // })
-    // .then(response => response.text())
-    // .then(turboStream => {
-    //   document.body.insertAdjacentHTML("beforeend", turboStream);
-    // })
-    // .catch(error => {
-    //   console.error('Error fetching chart data:', error);
-    // });
+    fetch(`/listings/${listingId}?year=${year}`, {
+      headers: {
+        "Accept": "text/vnd.turbo-stream.html",
+      },
+    })
+    .then(response => response.text())
+    .then(turboStream => {
+      document.body.insertAdjacentHTML("beforeend", turboStream);
+    })
+    .catch(error => {
+      console.error('Error fetching chart data:', error);
+    });
   }
 }
