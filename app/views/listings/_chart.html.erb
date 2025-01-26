@@ -3,11 +3,12 @@
      data-reviews-chart-year-value="<%= current_year %>"
      data-reviews-chart-reviews-value="<%= reviews.to_json %>"
      data-reviews-chart-listing-id-value="<%= listing.id %>"
+     class="col-7"
 >
   <label for="reviews-chart-select">Select a year for report:</label>
   <select id="reviews-chart-select" data-action="change->reviews-chart#reload" data-reviews-chart-target="selectedYear">
     <%= options_for_select(years, current_year) %>
   </select>
 
-  <canvas id="barChart" width="400" height="200"></canvas>
+  <canvas id="bar-chart" width="400" height="200"></canvas>
 </div>

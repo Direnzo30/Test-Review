@@ -30,6 +30,7 @@ class ListingsController < ApplicationController
     @years = @listing.reviews_years
     @current_year = params[:year] || @years.last
     @reviews = @listing.reviews_by_month_for_year(@current_year)
+    @words_for_cloud = @listing.words_for_cloud
 
     respond_to do |format|
       format.html

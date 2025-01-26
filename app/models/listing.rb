@@ -22,4 +22,17 @@ class Listing < ApplicationRecord
   def reviews_years
     reviews.pluck("DISTINCT(year)").sort
   end
+
+  def words_for_cloud
+    words = tags.last_30
+    # words it's an array of [[word, count]]
+    max_frequency = words.first[1].to_f
+    words.map do |word, count|
+      {
+        text: word,
+        # Scale for display purposes
+        count: (count / max_frequency * 100).round(2)
+      }
+    end
+  end
 end

@@ -1,8 +1,6 @@
 <h1>Your Review</h1>
 
-<div id=<%= dom_id(@listing) %> >
- <%= turbo_frame_tag "reviews_chart_container_frame" do %>
-    <%= render partial: "listings/chart", locals: {current_year: @current_year, years: @years, reviews: @reviews, listing: @listing } %>
-  <% end %>
-  </div>
+<div id=<%= dom_id(@listing)%> class="row justify-content-center align-items-center" >
+  <%= render partial: "listings/chart", locals: { current_year: @current_year, years: @years, reviews: @reviews, listing: @listing } %>
+  <%= render partial: "listings/cloud", locals: { words_for_cloud: @words_for_cloud } %>
 </div>

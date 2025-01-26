@@ -10,7 +10,7 @@ export default class extends Controller {
   }
 
   createChart() {
-    const ctx = document.getElementById('barChart').getContext('2d');
+    const ctx = document.getElementById('bar-chart').getContext('2d');
     this.chart = new Chart(ctx, {
       type: 'bar',
       data: {

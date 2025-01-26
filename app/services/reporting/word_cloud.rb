@@ -2,7 +2,7 @@ module Reporting
   class WordCloud
     attr_accessor :reviews
 
-    COMMON_WORDS = %w[the and a to of in is it you that he was for on are as with his they I at be this have from or by].freeze
+    COMMON_WORDS = %w[the and a to of in is it you those or that he was for on are as with his they i we have has does at be this have from or by].freeze
     
     def initialize(reviews:)
       @reviews = reviews
