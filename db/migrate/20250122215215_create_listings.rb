@@ -3,6 +3,7 @@ class CreateListings < ActiveRecord::Migration[7.1]
     create_table :listings do |t|
       t.string :name, null: false
       t.string :url, null: false
+      t.boolean :full_scrapped, null: false, default: false
       t.references :user, null: false, foreign_key: true
       t.timestamps
     end
