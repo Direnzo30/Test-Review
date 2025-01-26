@@ -1,12 +1,17 @@
-<%= turbo_stream.append "listings", partial: "listings/listing", collection: @listings, as: :listing %>
+<%= turbo_stream.append "listings" do %>
+  <%= render @listings %>
+<% end %>
 
 <% if @listings.next_page %>
   <%= turbo_stream.replace "pagination-button" do %>
     <button
       id="pagination-button"
       data-action="click->pagination#loadMore"
-      data-pagination-next-page-url="<%= listings_path(page: @listings.next_page) %>">
-      Load More
+      data-pagination-next-page-url="<%= listings_path(page: @listings.next_page) %>"
+      class="btn btn-primary btn-block d-flex justify-content-center align-items-center"
+    >
+      <span data-pagination-target="text">Load more</span>
+      <span class="spinner-border spinner-border-sm me-2 ms-2 d-none" role="status" aria-hidden="true" data-pagination-target="spinner"></span>
     </button>
   <% end %>
 <% else %>

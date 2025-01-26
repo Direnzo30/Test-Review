@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["listings"];
+  static targets = ["spinner"];
 
   connect(){
   }
@@ -9,9 +9,8 @@ export default class extends Controller {
   loadMore(event) {
     const button = event.currentTarget;
     const nextPageUrl = button.dataset.paginationNextPageUrl;
-
     if (!nextPageUrl) return;
-
+    this.spinnerTarget.classList.remove("d-none");
     fetch(nextPageUrl, {
       headers: {
         "Accept": "text/vnd.turbo-stream.html",
@@ -19,8 +18,8 @@ export default class extends Controller {
     })
     .then(response => response.text())
     .then(turboStream => {
-      console.log(turboStream)
       document.body.insertAdjacentHTML("beforeend", turboStream);
+      this.spinnerTarget.classList.add("d-none");
     })
     .catch(error => {
       console.error('Error fetching chart data:', error);
