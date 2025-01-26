@@ -1,4 +1,5 @@
-<h1>Your Review</h1>
+<h2>Review for: <%= @listing.name %></h2>
+<h3>Last update at: <%= @listing.updated_at.strftime("%B %d, %Y %I:%M %p")%></h3>
 
 <div id=<%= dom_id(@listing)%> class="row justify-content-center align-items-center" >
   <%= render partial: "listings/chart", locals: { current_year: @current_year, years: @years, reviews: @reviews, listing: @listing } %>

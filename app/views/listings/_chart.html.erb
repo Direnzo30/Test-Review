@@ -5,10 +5,12 @@
      data-reviews-chart-listing-id-value="<%= listing.id %>"
      class="col-7"
 >
-  <label for="reviews-chart-select">Select a year for report:</label>
-  <select id="reviews-chart-select" data-action="change->reviews-chart#reload" data-reviews-chart-target="selectedYear">
-    <%= options_for_select(years, current_year) %>
-  </select>
-
+  <h4>Number of reviews obtained by year</h4>
+  <div class="row">
+    <label class="form-label col-4">Select a year for report:</label>
+    <select class="col-3" data-action="change->reviews-chart#reload" data-reviews-chart-target="selectedYear">
+      <%= options_for_select(years, current_year) %>
+    </select>
+  </div>
   <canvas id="bar-chart" width="400" height="200"></canvas>
 </div>

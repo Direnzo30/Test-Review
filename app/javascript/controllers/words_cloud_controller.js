@@ -11,7 +11,6 @@ export default class extends Controller {
   renderWordCloud() {
     const words = this.wordsValue;
     const ctx = document.getElementById('words-cloud').getContext('2d');
-    console.log(words)
 
     new Chart(ctx, {
       type: "wordCloud",
@@ -19,7 +18,7 @@ export default class extends Controller {
         labels: words.map(word => word.text),
         datasets: [
           {
-            label: "Word Cloud",
+            label: "Must common words during reviews",
             data: words.map(word => word.count),
             color: words.map(() => `#${Math.floor(Math.random() * 16777215).toString(16)}`) // Random colors
           }
