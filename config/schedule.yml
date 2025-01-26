@@ -1,0 +1,4 @@
+batch_scrap_update:
+  cron: "0 0 * * *"
+  class: "Scrappers::UpdateListingsWorker"
+  queue: cron

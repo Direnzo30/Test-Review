@@ -13,7 +13,9 @@
 
   <body>
     <div class="container">
-      <%= render 'commons/navbar' %>
+      <% if current_user.present? %>
+        <%= render 'commons/navbar' %>
+      <% end %>
       <%= yield %>
     </div>
   </body>

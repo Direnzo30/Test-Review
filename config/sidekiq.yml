@@ -1,0 +1,8 @@
+# config/sidekiq.yml
+:queues:
+  - [critical, 3]
+  - [cron, 3]
+  - [default, 2]
+  - [low, 1]
+
+:concurrency: 10
