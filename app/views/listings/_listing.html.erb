@@ -1,3 +1,7 @@
 <div class="listing">
-  <%= link_to "#{listing.created_at.strftime("%B %d, %Y")} - #{listing.name}", listing_path(listing) %>
+  <%if listing.full_scrapped %>
+    <%= link_to "#{listing.created_at.strftime("%B %d, %Y")} - #{listing.name}", listing_path(listing) %>
+  <% else %>
+    <label><%= "#{listing.created_at.strftime("%B %d, %Y")} - #{listing.name} (Waiting for reviews extraction)" %></label>
+  <% end %>
 </div>

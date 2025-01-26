@@ -1,10 +1,7 @@
 module Scrappers
-  class Airbnb < Scrappers::Base
+  class Airbnb < Scrappers::AirbnbLight
     attr_accessor :reviews_list, :tags_list
 
-    TRANSLATION_MODAL = 'header[data-testid="translation-announce-modal"]'.freeze
-    CLOSE_TRANSLATION_MODAL = 'div[role="dialog"] button[aria-label="Close"]'.freeze
-    PROPERTY_NAME_CONTAINER = 'div[data-section-id="TITLE_DEFAULT"] h1.hpipapi'.freeze
     REVIEWS_BUTTON_CONTAINER = 'button[data-testid="pdp-show-all-reviews-button"]'.freeze
     REVIEWS_AREA_SCROLL_CONTAINER = 'div[role="dialog"] ._17itzz4'.freeze
     SINGLE_REVIEW_CONTAINER = '[data-review-id]'.freeze
@@ -15,20 +12,20 @@ module Scrappers
     DATE_INDEX = 2
 
     def initialize(url:, listing: nil, user_id: nil, apply_save: true)
+      super(url: url, user_id: user_id)
       @listing = listing
-      @user_id = user_id
-      @property_name = ""
       @reviews_list = []
       @tags_list = []
       @apply_save = apply_save
-      super(url)
     end
 
     def scrap
       begin
         driver.get(url)
+        # steps coming from AirbnbLight
         dismiss_translation_modal
         property_name_flow
+        # en of shared steps
         reviews_button_flow
         modal_flow
         reviews_flow
@@ -45,30 +42,6 @@ module Scrappers
     end
 
     private
-
-    # Step 1
-    def dismiss_translation_modal
-      begin
-        translation_modal = scrapping_wait.until do
-          driver.find_element(css: TRANSLATION_MODAL)
-        end
-        close_button = scrapping_wait.until do
-          driver.find_element(css: CLOSE_TRANSLATION_MODAL)
-        end
-        close_button.click
-        # let the page load for be interactive for other flows
-        sleep 1
-      rescue
-        # This means the modal was nerver triggered
-      end
-    end
-
-    # Step 2
-    def property_name_flow
-      @property_name = scrapping_wait.until do
-        driver.find_element(css: PROPERTY_NAME_CONTAINER).text
-      end
-    end
 
     # Step 3
     def reviews_button_flow
@@ -166,13 +139,14 @@ module Scrappers
             listing.user_id = @user_id
             listing.name = @property_name
             listing.url = @url
+            listing.full_scrapped = true
           end
           @listing.save!
           @reviews_list.each { |r| r[:listing_id] = @listing.id }
           @tags_list.each { |t| t[:listing_id] = @listing.id }
         else
           # This ensures updating the record for the snapshot to see when the porcess was triggered
-          @listing.update!(name: @property_name, updated_at: Time.now.utc)
+          @listing.update!(name: @property_name, full_scrapped: true, updated_at: Time.now.utc)
         end
 
         # Avoid creating unnecessary reviews 

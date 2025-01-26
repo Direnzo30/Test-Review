@@ -4,7 +4,7 @@ module Scrappers
   class Base
     attr_accessor :driver, :url, :scrapping_wait
 
-    SELENIUM_TIME_OUT = 10
+    SELENIUM_TIME_OUT = 5
 
     def initialize(url)
       options = Selenium::WebDriver::Chrome::Options.new

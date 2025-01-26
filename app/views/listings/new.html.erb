@@ -2,7 +2,12 @@
 
   <%= form_with url: listings_path, method: :post, local: true, class: "needs-validation", data: { turbo: false, controller: 'submit' } do |form| %>
     <div class="mb-3">
+      <% if @errors.any? %>
+        <label class="form-label"> <%= @errors.first %></label>
+      <% end %>
       <%= form.text_field :url, class: "form-control", placeholder: "Enter Airbnb URL", required: true %>
+      <%= form.check_box :process_in_background %>
+      <%= form.label :process_in_background %>
     </div>
 
     <div class="row">

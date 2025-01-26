@@ -11,16 +11,28 @@ class ListingsController < ApplicationController
   end
 
   def new
+    @errors = []
   end
 
   def create
-    listing = Scrappers::Airbnb.new(url: params[:url], user_id: current_user.id).scrap
+    is_in_background = ActiveModel::Type::Boolean.new.cast(params[:process_in_background])
+
+    if is_in_background
+      scrapper = Scrappers::AirbnbLight.new(url: params[:url], user_id: current_user.id)
+    else
+      scrapper = Scrappers::Airbnb.new(url: params[:url], user_id: current_user.id)
+    end
+
+    listing = scrapper.scrap
+
     if listing
+      Scrappers::UpdateListingWorker.perform_async(listing.id) if is_in_background
       respond_to do |format|
-        format.html { redirect_to listing }
+        format.html { redirect_to (is_in_background ? listings_path : listing) }
       end
     else
       respond_to do |format|
+        @errors = ["Unable to fetch information for url: #{params[:url]}"]
         format.html { render :new, status: :unprocessable_entity }
       end
     end
