@@ -5,7 +5,7 @@
   </div>
   
   <div class="col">
-    <%= form_for(resource, as: resource_name, url: session_path(resource_name), data: { controller: 'submit' }) do |f| %>
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name), data: { turbo: false, controller: 'submit' }) do |f| %>
       <div class="row mb-3">
         <%= f.label :email, class: "col-sm-2 col-form-label"%>
         <div class="col-sm-6">
